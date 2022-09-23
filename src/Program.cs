@@ -4,14 +4,14 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
-var cmd = static async (string input, string output) =>
-{
-    if (input == null || output == null)
-    {
-        Console.WriteLine("Usage: <input> <output>");
-        return;
-    }
+#if DEBUG
+await Cmd("./test.pdb", "./meta");
+#else
+await Cmd(args[0], args[1]);
+#endif
 
+static async Task Cmd(string input, string output)
+{
     Directory.CreateDirectory(output);
 
     MetadataReader reader;
@@ -29,14 +29,7 @@ var cmd = static async (string input, string output) =>
     }
 
     await ParseSourceLink(reader, output);
-};
-#if DEBUG
-await cmd("./test.pdb", "./meta");
-#else
-await cmd(args[0], args[1]);
-#endif
-
-
+}
 
 static async Task ParseSourceLink(MetadataReader reader, string output)
 {
@@ -64,7 +57,7 @@ static async Task ParseSourceLink(MetadataReader reader, string output)
             meta.docs.Add(doc);
         }
     }
-    await meta.WriteAsync(Path.Combine(output, "metadata.json"));
+    await meta.WriteTo(Path.Combine(output, "metadata.json"));
 }
 
 static async Task<Doc> ParseDocument(Ctx ctx, DocumentHandle documentHandle)
@@ -153,7 +146,7 @@ class SourceLink
     public static Guid SourceLinkId { get; } = new("CC110556-A091-4D38-9FEC-25AB9A351A6A");
 
     [JsonPropertyName("documents")]
-    public IDictionary<string, string> Documents { get; set; }
+    public Dictionary<string, string> Documents { get; set; }
 
     public string? GetUrl(string file)
     {
@@ -190,7 +183,7 @@ class SourceLink
 
 static class MetaExt
 {
-    public static async Task WriteAsync(this Meta link, string path)
+    public static async Task WriteTo(this Meta link, string path)
     {
         using var fs = File.Create(path);
         await JsonSerializer.SerializeAsync(fs, link);
