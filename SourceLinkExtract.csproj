@@ -3,9 +3,17 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net6.0</TargetFramework>
+		<LangVersion>10</LangVersion>
+		<Nullable>enable</Nullable>
 		<RootNamespace>SourceLinkExtract</RootNamespace>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<PackAsTool>true</PackAsTool>
+		<ToolCommandName>extract</ToolCommandName>
+		<PackageOutputPath>./publish</PackageOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
