@@ -8,6 +8,8 @@ A tool to extract source files using sourcelink metadata.
 extract ./test.dll ./test-meta/
 ```
 
+If you for some reason have to use Windows, convert your compilation to portable pdb https://github.com/dotnet/symreader-converter
+
 ## Argument 1
 The input filepath can be a pdb, or compilation (exe/dll/...).
 
