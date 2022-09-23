@@ -16,7 +16,19 @@
 		<PackageOutputPath>./publish</PackageOutputPath>
 	</PropertyGroup>
 
+	<PropertyGroup Label="Nuget Pack Options">
+		<Description>Tool to extract source code from a executable or pdb using sourcelink.</Description>
+		<PackageVersion>1.0.0</PackageVersion>
+		<PackageId>SourceLinkExtract</PackageId>
+		<PackageTags>sourcelink tool</PackageTags>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<PackageReference Include="System.Reflection.Metadata" Version="6.0.1" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="../../README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
 </Project>
