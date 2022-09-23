@@ -5,12 +5,12 @@ using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 #if DEBUG
-await Cmd("./test.pdb", "./meta");
+await Cmd("./test.pdb", "./meta/metadata.json", "./meta");
 #else
-await Cmd(args[0], args[1]);
+await Cmd(args[0], args[1], args[2]);
 #endif
 
-static async Task Cmd(string input, string output)
+static async Task Cmd(string input, string metadata, string output)
 {
     Directory.CreateDirectory(output);
 
@@ -28,10 +28,10 @@ static async Task Cmd(string input, string output)
         reader = pe.GetMetadataReader();
     }
 
-    await ParseSourceLink(reader, output);
+    await ParseSourceLink(reader, metadata, output);
 }
 
-static async Task ParseSourceLink(MetadataReader reader, string output)
+static async Task ParseSourceLink(MetadataReader reader, string metadata, string output)
 {
     SourceLink? link = GetSourceLink(reader);
     if (link == null)
@@ -57,7 +57,7 @@ static async Task ParseSourceLink(MetadataReader reader, string output)
             meta.docs.Add(doc);
         }
     }
-    await meta.WriteTo(Path.Combine(output, "metadata.json"));
+    await meta.WriteTo(metadata);
 }
 
 static async Task<Doc> ParseDocument(Ctx ctx, DocumentHandle documentHandle)
