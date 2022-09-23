@@ -1,5 +1,7 @@
 # SourceLinkExtract
 
+[NuGet here](https://www.nuget.org/packages/SourceLinkExtract/)
+
 A tool to extract source files using sourcelink metadata.
 
 ```bash
