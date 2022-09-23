@@ -5,7 +5,7 @@
 A tool to extract source files using sourcelink metadata.
 
 ```bash
-dotnet extract ./test.dll ./test-meta/
+extract ./test.dll ./test-meta/
 ```
 
 ## Argument 1
