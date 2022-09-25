@@ -34,11 +34,6 @@ static async Task Cmd(string input, string metadata, string output)
 static async Task ParseSourceLink(MetadataReader reader, string metadata, string output)
 {
     SourceLink? link = GetSourceLink(reader);
-    if (link == null)
-    {
-        Console.WriteLine("No SourceLink found");
-        return;
-    }
 
     foreach (var assemblyHandle in reader.AssemblyFiles)
     {
@@ -65,6 +60,7 @@ static async Task<Doc> ParseDocument(Ctx ctx, DocumentHandle documentHandle)
     Document document = ctx.reader.GetDocument(documentHandle);
     if (document.Name.IsNil || document.Language.IsNil || document.Hash.IsNil || document.HashAlgorithm.IsNil)
     {
+        Console.WriteLine($"Document not found for handle {documentHandle}");
         return default;
     }
 
@@ -76,12 +72,14 @@ static async Task<Doc> ParseDocument(Ctx ctx, DocumentHandle documentHandle)
         var url = ctx.link.GetUrl(doc.name);
         if (url != null)
         {
+            Console.WriteLine($"Downloading source from {url}");
             content = await ctx.http.GetByteArrayAsync(url);
         }
     }
 
     if (content == null)
     {
+        Console.WriteLine($"No SourceLink or Embedded document for {doc.name}");
         return doc;
     }
 
@@ -95,6 +93,7 @@ static async Task<Doc> ParseDocument(Ctx ctx, DocumentHandle documentHandle)
     }
 
     string path = Path.Combine(ctx.output, doc.name);
+    Console.WriteLine($"Writing source to {path}");
     Directory.CreateDirectory(Path.GetDirectoryName(path)!);
     await File.WriteAllBytesAsync(path, content);
     return doc;
@@ -134,9 +133,9 @@ static byte[]? GetEmbeddedDocumentContent(MetadataReader reader, DocumentHandle 
     return null;
 }
 
-readonly record struct Ctx(string output, MetadataReader reader, SourceLink link, HttpClient http);
+readonly record struct Ctx(string output, MetadataReader reader, SourceLink? link, HttpClient http);
 
-record struct Meta(SourceLink link, List<Doc> docs);
+record struct Meta(SourceLink? link, List<Doc> docs);
 
 record struct Doc(string name, Guid lang, Guid algo, byte[] hash);
 
