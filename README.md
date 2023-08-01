@@ -49,3 +49,7 @@ Output directorypath of extracted sourcecode.
 ./meta/src/Abstractions/Database.cs
 [...]
 ```
+
+## Argument 4
+Build path. The base path at which the assembly was build.
+This prefix is removed from the directory name to ensure a relative path is used when generating the symbols.
