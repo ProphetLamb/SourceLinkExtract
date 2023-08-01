@@ -149,7 +149,7 @@ class SourceLink
     public static Guid SourceLinkId { get; } = new("CC110556-A091-4D38-9FEC-25AB9A351A6A");
 
     [JsonPropertyName("documents")]
-    public Dictionary<string, string> Documents { get; set; }
+    public Dictionary<string, string>? Documents { get; set; }
 
     public string? GetUrl(string file)
     {
