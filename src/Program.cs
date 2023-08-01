@@ -7,10 +7,10 @@ using System.Text.RegularExpressions;
 #if DEBUG
 await Cmd("./test.pdb", "./meta/metadata.json", "./meta");
 #else
-await Cmd(args[0], args[1], args[2]);
+await Cmd(args[0], args[1], args[2], args.Length > 3 ? args[3] : null);
 #endif
 
-static async Task Cmd(string input, string metadata, string output)
+static async Task Cmd(string input, string metadata, string output, string? buildDirectory = null)
 {
     Directory.CreateDirectory(output);
 
@@ -28,10 +28,10 @@ static async Task Cmd(string input, string metadata, string output)
         reader = pe.GetMetadataReader();
     }
 
-    await ParseSourceLink(reader, metadata, output);
+    await ParseSourceLink(reader, metadata, output, buildDirectory);
 }
 
-static async Task ParseSourceLink(MetadataReader reader, string metadata, string output)
+static async Task ParseSourceLink(MetadataReader reader, string metadata, string output, string? buildDirectory)
 {
     SourceLink? link = GetSourceLink(reader);
 
@@ -42,7 +42,7 @@ static async Task ParseSourceLink(MetadataReader reader, string metadata, string
         byte[] hash = reader.GetBlobBytes(assembly.HashValue);
     }
 
-    Ctx ctx = new(output, reader, link, new());
+    Ctx ctx = new(output, buildDirectory, reader, link, new());
     Meta meta = new(link, new());
     foreach (DocumentHandle documentHandle in reader.Documents)
     {
@@ -83,7 +83,11 @@ static async Task<Doc> ParseDocument(Ctx ctx, DocumentHandle documentHandle)
         return doc;
     }
 
-    if (doc.name.StartsWith("/_/", StringComparison.Ordinal))
+    if (ctx.buildDirectory is not null && doc.name.StartsWith(ctx.buildDirectory, StringComparison.Ordinal))
+    {
+        doc.name = doc.name.Substring(ctx.buildDirectory.Length);
+    }
+    else if (doc.name.StartsWith("/_/", StringComparison.Ordinal))
     {
         doc.name = doc.name.Substring(3);
     }
@@ -133,7 +137,7 @@ static byte[]? GetEmbeddedDocumentContent(MetadataReader reader, DocumentHandle 
     return null;
 }
 
-readonly record struct Ctx(string output, MetadataReader reader, SourceLink? link, HttpClient http);
+readonly record struct Ctx(string output, string? buildDirectory, MetadataReader reader, SourceLink? link, HttpClient http);
 
 record struct Meta(SourceLink? link, List<Doc> docs);
 
